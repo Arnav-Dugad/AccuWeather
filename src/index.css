@@ -1,0 +1,290 @@
+@import 'tailwindcss';
+
+@theme {
+  --breakpoint-xs: 480px;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --color-ink: #e8ecff;
+  --color-ink-soft: #9aa6cc;
+  --color-base: #070b18;
+}
+
+/* ---------- base ---------- */
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: var(--color-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+/* ---------- animated aurora backdrop ---------- */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 800px at 12% -10%, #1b2a6b 0%, transparent 55%),
+    radial-gradient(1000px 700px at 88% 0%, #3b1d6e 0%, transparent 50%),
+    linear-gradient(180deg, #070b18 0%, #060912 60%, #04060d 100%);
+}
+
+.aurora::before,
+.aurora::after {
+  content: '';
+  position: absolute;
+  width: 70vw;
+  height: 70vw;
+  max-width: 620px;
+  max-height: 620px;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  animation: drift 26s ease-in-out infinite alternate;
+}
+
+@media (min-width: 768px) {
+  .aurora::before,
+  .aurora::after {
+    width: 46vw;
+    height: 46vw;
+    filter: blur(90px);
+  }
+}
+
+.aurora::before {
+  top: -10%;
+  left: -8%;
+  background: radial-gradient(circle, #2563eb 0%, transparent 65%);
+}
+
+.aurora::after {
+  bottom: -16%;
+  right: -10%;
+  background: radial-gradient(circle, #a855f7 0%, transparent 65%);
+  animation-duration: 32s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(6vw, 5vh, 0) scale(1.18);
+  }
+}
+
+/* fine grain/vignette for depth */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 120% at 50% 0%, transparent 60%, rgba(0, 0, 0, 0.55) 100%);
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora::before,
+  .aurora::after {
+    animation: none;
+  }
+}
+
+/* ---------- glass system ---------- */
+.glass {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 20px 50px -20px rgba(0, 0, 0, 0.7);
+}
+
+.glass-hover {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.glass-hover:hover {
+  transform: translateY(-2px) perspective(600px) rotateX(1deg) rotateY(-1deg);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
+    0 28px 60px -22px rgba(0, 0, 0, 0.8);
+}
+
+.chip {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------- keyboard focus ---------- */
+:focus-visible {
+  outline: 2px solid #7dd3fc;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+/* don't show the ring for mouse clicks, only keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Opaque floating surface for menus/dropdowns (solid so content behind never
+   bleeds through — unlike the translucent .glass). */
+.popover {
+  background: rgba(11, 16, 32, 0.985);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 60px -16px rgba(0, 0, 0, 0.85);
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+}
+
+/* ---------- scrollbars ---------- */
+.scroll-x {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.scroll-x::-webkit-scrollbar {
+  height: 6px;
+}
+.scroll-x::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 99px;
+}
+
+/* ---------- radar range input ---------- */
+.radar-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+.radar-range::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: #38bdf8;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* ---------- skeleton shimmer ---------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ---------- leaflet dark fixes ---------- */
+.leaflet-container {
+  background: #0a0f1f;
+  font-family: var(--font-sans);
+}
+.leaflet-control-attribution {
+  background: rgba(7, 11, 24, 0.7) !important;
+  color: #6b7699 !important;
+}
+.leaflet-control-attribution a {
+  color: #8b9ad1 !important;
+}
+.leaflet-bar a {
+  background: rgba(20, 26, 48, 0.9) !important;
+  color: #e8ecff !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ---------- weather scene animations ---------- */
+.scene-spin-slow {
+  animation: scene-spin 30s linear infinite;
+}
+.scene-drift {
+  animation: scene-drift 20s ease-in-out infinite;
+}
+.scene-fall {
+  animation: scene-fall 1s linear infinite;
+}
+.scene-snow {
+  animation: scene-snow 4s ease-in-out infinite;
+}
+.scene-flash {
+  animation: scene-flash 4s ease-in-out infinite;
+}
+
+@keyframes scene-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes scene-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(110%); }
+}
+@keyframes scene-fall {
+  0% { transform: translateY(-20px); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(200px); opacity: 0; }
+}
+@keyframes scene-snow {
+  0% { transform: translate(0, -10px); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translate(15px, 200px); opacity: 0; }
+}
+@keyframes scene-flash {
+  0%, 90%, 100% { background: rgba(255, 255, 255, 0); }
+  93% { background: rgba(255, 255, 255, 0.15); }
+  96% { background: rgba(255, 255, 255, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-spin-slow,
+  .scene-drift,
+  .scene-fall,
+  .scene-snow,
+  .scene-flash {
+    animation: none !important;
+  }
+}

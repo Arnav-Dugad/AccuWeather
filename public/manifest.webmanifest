@@ -1,0 +1,20 @@
+{
+  "name": "AccuWeather — Smart Model Router",
+  "short_name": "AccuWeather",
+  "description": "Ultra-accurate, zero-cost weather with a region-aware multi-model consensus engine.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#070b18",
+  "theme_color": "#070b18",
+  "categories": ["weather", "utilities"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
