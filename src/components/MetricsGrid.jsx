@@ -90,8 +90,8 @@ export default function MetricsGrid({ data }) {
       {/* Pressure tile with sparkline */}
       <motion.div variants={tile} className="glass glass-hover rounded-2xl p-4">
         <div className="flex items-center gap-2 text-ink-soft">
-          <Gauge size={15} style={{ color: '#fbbf24' }} />
-          <span className="text-[11px] font-medium uppercase tracking-wider">Pressure</span>
+          <Gauge size={16} style={{ color: '#fbbf24' }} />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">Pressure</span>
         </div>
         <div className="mt-2 flex items-baseline gap-1">
           <span className="font-display text-2xl font-semibold tabular-nums text-ink">
@@ -106,11 +106,11 @@ export default function MetricsGrid({ data }) {
         <PressureSparkline hours={data.consensus.hourly} />
       </motion.div>
 
-      {items.map(({ Icon, label, value, unit, sub, SubIcon, accent }) => (
+      {items.map(({ Icon, label, value, unit, sub, accent }) => (
         <motion.div key={label} variants={tile} className="glass glass-hover rounded-2xl p-4">
           <div className="flex items-center gap-2 text-ink-soft">
-            <Icon size={15} style={{ color: accent }} />
-            <span className="text-[11px] font-medium uppercase tracking-wider">{label}</span>
+            <Icon size={16} style={{ color: accent }} />
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em]">{label}</span>
           </div>
           <div className="mt-2 flex items-baseline gap-1">
             <span className="font-display text-2xl font-semibold tabular-nums text-ink">
@@ -119,7 +119,6 @@ export default function MetricsGrid({ data }) {
             {value !== null && unit && <span className="text-xs text-ink-soft">{unit}</span>}
             {sub && (
               <span className="ml-auto inline-flex items-center gap-0.5 text-xs font-medium text-ink/80">
-                {SubIcon && <SubIcon size={12} />}
                 {sub}
               </span>
             )}

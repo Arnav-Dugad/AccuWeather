@@ -31,7 +31,7 @@ export default function AirQualityCard({ aq, status }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-      className="glass relative overflow-hidden rounded-3xl p-6"
+      className="glass relative overflow-hidden rounded-3xl p-5"
     >
       <div
         className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full opacity-40 blur-3xl"

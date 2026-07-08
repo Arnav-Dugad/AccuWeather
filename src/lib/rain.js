@@ -99,6 +99,7 @@ export function rainConfidenceLabel(agreement) {
 function aggregateHour(models, i, denom) {
   let popW = 0;
   let amtW = 0;
+  let activeDenom = 0; // only models that actually contributed at this hour
   const pool = [];
   for (const m of models) {
     const w = m.weight > 0 ? m.weight : 0;
@@ -109,13 +110,17 @@ function aggregateHour(models, i, denom) {
     if (w > 0) {
       popW += rainy * w;
       amtW += mean * w;
+      activeDenom += w;
       for (const v of vals) pool.push(v);
     }
   }
+  // Divide by the weight that actually contributed so a model missing at this
+  // hour doesn't dilute the probability. Fall back to the global denom.
+  const d = activeDenom > 0 ? activeDenom : denom;
   pool.sort((a, b) => a - b);
   return {
-    pop: Math.round((popW / denom) * 100),
-    amount: amtW / denom,
+    pop: Math.round((popW / d) * 100),
+    amount: amtW / d,
     p25: percentile(pool, 25),
     p75: percentile(pool, 75),
   };
@@ -150,6 +155,7 @@ export function computeRainOutlook(models) {
   const daily = [...byDate.entries()].slice(0, 7).map(([date, idxs]) => {
     let popW = 0;
     let amtW = 0;
+    let activeDenom = 0;
     const pool = [];
     for (const m of models) {
       const w = m.weight > 0 ? m.weight : 0;
@@ -160,14 +166,16 @@ export function computeRainOutlook(models) {
       if (w > 0) {
         popW += rainy * w;
         amtW += mean * w;
+        activeDenom += w;
         for (const s of sums) pool.push(s);
       }
     }
+    const d = activeDenom > 0 ? activeDenom : denom;
     pool.sort((a, b) => a - b);
     return {
       date,
-      pop: Math.round((popW / denom) * 100),
-      amount: amtW / denom,
+      pop: Math.round((popW / d) * 100),
+      amount: amtW / d,
       p25: percentile(pool, 25),
       p75: percentile(pool, 75),
     };

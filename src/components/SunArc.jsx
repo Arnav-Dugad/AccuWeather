@@ -46,13 +46,46 @@ export default function SunArc({ sun, utcOffset, sunshineDuration }) {
   const grPt = pointOnArc(cx, cy, r, goldenRise);
   const gsPt = pointOnArc(cx, cy, r, goldenSet);
 
+  // ---- live countdown to the next sun event + golden-hour window ----
+  const nowMs = Date.now() + (utcOffset ?? 0) * 1000;
+  const sriseMs = sun.sunrise ? Date.parse(`${sun.sunrise}Z`) : null;
+  const ssetMs = sun.sunset ? Date.parse(`${sun.sunset}Z`) : null;
+  const fmtDur = (ms) => {
+    const m = Math.max(0, Math.round(ms / 60000));
+    const h = Math.floor(m / 60);
+    return h > 0 ? `${h}h ${m % 60}m` : `${m}m`;
+  };
+  let countdown = null;
+  if (sriseMs && nowMs < sriseMs) countdown = { label: 'Sunrise in', value: fmtDur(sriseMs - nowMs) };
+  else if (ssetMs && nowMs <= ssetMs) countdown = { label: 'Sunset in', value: fmtDur(ssetMs - nowMs) };
+
+  // These "Z"-parsed timestamps encode local wall-clock, so read them back in UTC.
+  const toClock = (ms) => {
+    const d = new Date(ms);
+    let h = d.getUTCHours();
+    const m = String(d.getUTCMinutes()).padStart(2, '0');
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${m} ${ap}`;
+  };
+  const goldenWinMs = dayLenMs ? goldenRise * dayLenMs : null;
+  const goldenEve = ssetMs && goldenWinMs ? `${toClock(ssetMs - goldenWinMs)}–${toClock(ssetMs)}` : null;
+
   const arcPath = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
 
   return (
     <div className="glass glass-hover rounded-3xl p-5">
-      <div className="flex items-center gap-2 text-ink-soft mb-3">
-        <Sun size={16} className="text-amber-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Sun Position</h3>
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-ink-soft">
+          <Sun size={16} className="text-amber-300" />
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Sun Position</h3>
+        </div>
+        {countdown && (
+          <span className="inline-flex items-baseline gap-1 rounded-full bg-amber-400/10 px-2.5 py-1 text-[11px] ring-1 ring-amber-400/20">
+            <span className="text-ink-soft">{countdown.label}</span>
+            <span className="font-display font-semibold tabular-nums text-amber-200">{countdown.value}</span>
+          </span>
+        )}
       </div>
 
       <svg
@@ -154,6 +187,18 @@ export default function SunArc({ sun, utcOffset, sunshineDuration }) {
           </div>
         )}
       </div>
+
+      {goldenEve && (
+        <>
+          <div className="divider my-3" />
+          <div className="flex items-center justify-between text-xs">
+            <span className="inline-flex items-center gap-1.5 text-ink-soft">
+              <Sun size={13} className="text-orange-300" /> Golden hour
+            </span>
+            <span className="font-display font-semibold tabular-nums text-ink">{goldenEve}</span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

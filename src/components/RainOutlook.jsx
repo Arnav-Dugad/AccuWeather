@@ -54,7 +54,7 @@ export default function RainOutlook({ outlook, status }) {
 
       {/* next 24h PoP bars */}
       <div className="mt-5">
-        <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-soft">
+        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
           Chance of rain · next 24h
         </div>
         <div className="scroll-x overflow-x-auto pb-1">
@@ -90,7 +90,7 @@ export default function RainOutlook({ outlook, status }) {
       <div className="divider my-4" />
 
       {/* 7-day rain probability + amount band */}
-      <div className="text-[11px] font-semibold uppercase tracking-wider text-ink-soft">7-day rain</div>
+      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">7-day rain</div>
       <div className="mt-2 flex flex-col">
         {outlook.daily.map((d, i) => {
           const cat = popCategory(d.pop);

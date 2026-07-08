@@ -12,7 +12,7 @@ export default function DaySummary({ consensus }) {
         <Sparkles size={15} className="text-sky-300" />
       </span>
       <div className="min-w-0">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-soft">Today at a glance</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">Today at a glance</div>
         <p className="mt-0.5 text-sm leading-relaxed text-ink">{text}</p>
       </div>
     </div>

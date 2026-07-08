@@ -25,10 +25,12 @@ import SunArc from './components/SunArc.jsx';
 import MoonPhase from './components/MoonPhase.jsx';
 import WhatToWear from './components/WhatToWear.jsx';
 import TomorrowCompare from './components/TomorrowCompare.jsx';
+import ComfortIndex from './components/ComfortIndex.jsx';
 import ActivityScore from './components/ActivityScore.jsx';
 import BestTime from './components/BestTime.jsx';
 import UvWindow from './components/UvWindow.jsx';
 import NextChange from './components/NextChange.jsx';
+import StormSignal from './components/StormSignal.jsx';
 import EventTimeline from './components/EventTimeline.jsx';
 import WeekOutlook from './components/WeekOutlook.jsx';
 import RainNowcast from './components/RainNowcast.jsx';
@@ -192,13 +194,15 @@ export default function App() {
 
                 <DaySummary consensus={data.consensus} />
 
-                <motion.div variants={fadeUp}>
+                <motion.div variants={fadeUp} className="grid gap-4 sm:gap-5 lg:grid-cols-2">
                   <NextChange data={data} />
+                  <StormSignal data={data} />
                 </motion.div>
 
-                <motion.div variants={fadeUp} className="grid gap-4 sm:gap-5 lg:grid-cols-2">
+                <motion.div variants={fadeUp} className="grid items-stretch gap-4 sm:gap-5 lg:grid-cols-3">
                   <WhatToWear data={data} />
                   <TomorrowCompare data={data} />
+                  <ComfortIndex data={data} />
                 </motion.div>
 
                 <motion.div variants={fadeUp} className="grid items-start gap-4 sm:gap-5 lg:grid-cols-3">
