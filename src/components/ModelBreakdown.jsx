@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Layers, ChevronDown, Info } from 'lucide-react';
 import WeatherIcon from './WeatherIcon.jsx';
 import { weatherFor } from '../lib/weatherCodes.js';
 import { pct, round } from '../lib/format.js';
 import { useUnits } from '../context/UnitsContext.jsx';
+import { usePersistentDisclosure } from '../hooks/usePersistentDisclosure.js';
 
 /**
  * Transparency panel: what each individual model says, side by side, with its
@@ -12,7 +12,7 @@ import { useUnits } from '../context/UnitsContext.jsx';
  * Props: data, consensusTemp
  */
 export default function ModelBreakdown({ data }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = usePersistentDisclosure('model-breakdown', false);
   const models = data.models;
   const consensusTemp = data.consensus.current.temp;
 

@@ -10,7 +10,9 @@ import { useGeolocation } from './hooks/useGeolocation.js';
 import { useWeather } from './hooks/useWeather.js';
 import { useAirQuality } from './hooks/useAirQuality.js';
 import { useRainOutlook } from './hooks/useRainOutlook.js';
+import { useMarine } from './hooks/useMarine.js';
 import { useSavedLocations } from './hooks/useSavedLocations.js';
+import { pollenRisk } from './lib/airQuality.js';
 
 import SearchBar from './components/SearchBar.jsx';
 import UnitsToggle from './components/UnitsToggle.jsx';
@@ -25,6 +27,7 @@ import SunArc from './components/SunArc.jsx';
 import MoonPhase from './components/MoonPhase.jsx';
 import WhatToWear from './components/WhatToWear.jsx';
 import TomorrowCompare from './components/TomorrowCompare.jsx';
+import YesterdayCompare from './components/YesterdayCompare.jsx';
 import ComfortIndex from './components/ComfortIndex.jsx';
 import ActivityScore from './components/ActivityScore.jsx';
 import BestTime from './components/BestTime.jsx';
@@ -36,6 +39,8 @@ import WeekOutlook from './components/WeekOutlook.jsx';
 import RainNowcast from './components/RainNowcast.jsx';
 import RainOutlook from './components/RainOutlook.jsx';
 import ModelBreakdown from './components/ModelBreakdown.jsx';
+import PollenCard from './components/PollenCard.jsx';
+import MarineCard from './components/MarineCard.jsx';
 import MetricsGrid from './components/MetricsGrid.jsx';
 import HourlyStrip from './components/HourlyStrip.jsx';
 import DailyForecast from './components/DailyForecast.jsx';
@@ -56,7 +61,11 @@ export default function App() {
   const { data, region, status, error, reload } = useWeather(location);
   const { data: aq, status: aqStatus } = useAirQuality(location);
   const { outlook, nowcast, status: rainStatus } = useRainOutlook(location);
+  const { data: marine } = useMarine(location);
   const { saved, has, toggle, remove } = useSavedLocations();
+
+  const showPollen = !!pollenRisk(aq);
+  const showMarine = Number.isFinite(marine?.waveHeight);
 
   const selectLocation = useCallback((loc) => {
     userActedRef.current = true;
@@ -199,10 +208,11 @@ export default function App() {
                   <StormSignal data={data} />
                 </motion.div>
 
-                <motion.div variants={fadeUp} className="grid items-stretch gap-4 sm:gap-5 lg:grid-cols-3">
+                <motion.div variants={fadeUp} className="grid items-start gap-4 sm:gap-5 lg:grid-cols-2">
                   <WhatToWear data={data} />
-                  <TomorrowCompare data={data} />
                   <ComfortIndex data={data} />
+                  <TomorrowCompare data={data} />
+                  <YesterdayCompare data={data} />
                 </motion.div>
 
                 <motion.div variants={fadeUp} className="grid items-start gap-4 sm:gap-5 lg:grid-cols-3">
@@ -229,11 +239,12 @@ export default function App() {
                   <MoonPhase />
                 </motion.div>
 
-                <RegionBadge region={region} />
-
-                <motion.div variants={fadeUp}>
-                  <ModelBreakdown data={data} />
-                </motion.div>
+                {(showPollen || showMarine) && (
+                  <motion.div variants={fadeUp} className="grid items-start gap-4 sm:gap-5 lg:grid-cols-2">
+                    <PollenCard aq={aq} />
+                    <MarineCard marine={marine} />
+                  </motion.div>
+                )}
 
                 <motion.div variants={fadeUp}>
                   <RainOutlook outlook={outlook} status={rainStatus} />
@@ -247,7 +258,7 @@ export default function App() {
                   <WeekOutlook data={data} />
                 </motion.div>
 
-                <motion.div variants={fadeUp} className="grid gap-4 sm:gap-5 lg:grid-cols-2">
+                <motion.div variants={fadeUp} className="grid items-start gap-4 sm:gap-5 lg:grid-cols-2">
                   <HourlyStrip data={data} />
                   <DailyForecast data={data} rainDaily={outlook?.daily} />
                 </motion.div>
@@ -256,6 +267,13 @@ export default function App() {
                   <Suspense fallback={<div className="skeleton h-[300px] rounded-3xl sm:h-[380px] lg:h-[420px]" />}>
                     <RadarMap lat={location.latitude} lon={location.longitude} region={region} />
                   </Suspense>
+                </motion.div>
+
+                {/* Transparency / router internals — kept at the bottom */}
+                <RegionBadge region={region} />
+
+                <motion.div variants={fadeUp}>
+                  <ModelBreakdown data={data} />
                 </motion.div>
               </motion.div>
             )}

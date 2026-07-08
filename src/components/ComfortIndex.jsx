@@ -1,6 +1,7 @@
 import { Thermometer, Wind, Droplets, Sun } from 'lucide-react';
 import { dewPointComfort } from '../lib/format.js';
 import { useUnits } from '../context/UnitsContext.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 /**
  * Explains WHY it feels the way it does: the dominant driver of the gap between
@@ -57,13 +58,8 @@ export default function ComfortIndex({ data }) {
       : `Feels ${fmtSpread(absDiff)}° ${diff < 0 ? 'colder' : 'warmer'}`;
 
   return (
-    <div className="glass flex h-full flex-col rounded-3xl p-5" aria-label="Comfort breakdown">
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Thermometer size={16} className="text-orange-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Comfort</h3>
-      </div>
-
-      <div className="mt-3 flex flex-1 flex-col justify-center gap-3">
+    <CollapsibleCard id="comfort" icon={Thermometer} iconClass="text-orange-300" title="Comfort" ariaLabel="Comfort breakdown">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <span
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl"
@@ -94,6 +90,6 @@ export default function ComfortIndex({ data }) {
           </div>
         )}
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

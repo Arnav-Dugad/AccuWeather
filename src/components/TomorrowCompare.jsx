@@ -2,6 +2,7 @@ import { ArrowUp, ArrowDown, Minus, CalendarClock } from 'lucide-react';
 import WeatherIcon from './WeatherIcon.jsx';
 import { useUnits } from '../context/UnitsContext.jsx';
 import { round, pct } from '../lib/format.js';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 function Delta({ value, unit }) {
   if (value == null || Math.abs(value) < 0.5) {
@@ -33,13 +34,8 @@ export default function TomorrowCompare({ data }) {
   const rainWord = dRain > 15 ? 'Wetter' : dRain < -15 ? 'Drier' : '';
 
   return (
-    <div className="glass flex h-full flex-col rounded-3xl p-5">
-      <div className="flex items-center gap-2 text-ink-soft">
-        <CalendarClock size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Tomorrow vs Today</h3>
-      </div>
-
-      <div className="mt-3 flex flex-1 items-center gap-4">
+    <CollapsibleCard id="tomorrow" icon={CalendarClock} title="Tomorrow vs Today">
+      <div className="flex items-center gap-4">
         <WeatherIcon code={tomorrow.code} isDay={true} size={40} />
         <div className="flex flex-1 flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -70,6 +66,6 @@ export default function TomorrowCompare({ data }) {
       <p className="text-center text-xs font-medium text-ink-soft">
         {tempWord}{rainWord ? ` · ${rainWord}` : ''}
       </p>
-    </div>
+    </CollapsibleCard>
   );
 }

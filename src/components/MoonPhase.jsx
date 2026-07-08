@@ -1,4 +1,5 @@
 import { Moon } from 'lucide-react';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const SYNODIC = 29.53059;
 const REF_NEW_MOON = new Date('2000-01-06T18:14:00Z').getTime();
@@ -40,13 +41,8 @@ export default function MoonPhase() {
   const moon = getMoonPhase();
 
   return (
-    <div className="glass flex h-full flex-col rounded-3xl p-5">
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Moon size={16} className="text-amber-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Moon Phase</h3>
-      </div>
-
-      <div className="mt-4 flex flex-1 flex-col items-center justify-center gap-3">
+    <CollapsibleCard id="moon" icon={Moon} iconClass="text-amber-300" title="Moon Phase">
+      <div className="flex flex-col items-center gap-3">
         <MoonDisc illumination={moon.illumination} segment={moon.segment} />
         <div className="text-center">
           <p className="font-display text-base font-semibold text-ink">{moon.name}</p>
@@ -66,6 +62,6 @@ export default function MoonPhase() {
           <p className="text-ink-soft">Next New</p>
         </div>
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

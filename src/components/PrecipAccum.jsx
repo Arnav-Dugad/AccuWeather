@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { CloudRain } from 'lucide-react';
 import { hourLabel, round } from '../lib/format.js';
 import { useUnits } from '../context/UnitsContext.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 export default function PrecipAccum({ hours }) {
   const { fmtRain, rainUnit } = useUnits();
@@ -42,12 +43,7 @@ export default function PrecipAccum({ hours }) {
     i === 0 ? 'translate-x-0' : i === cumulative.length - 1 ? '-translate-x-full' : '-translate-x-1/2';
 
   return (
-    <div className="glass rounded-3xl p-5 sm:p-6">
-      <div className="mb-4 flex items-center gap-2 text-ink-soft">
-        <CloudRain size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Rain Accumulation &middot; 24h</h3>
-      </div>
-
+    <CollapsibleCard id="precip-accum" icon={CloudRain} title="Rain Accumulation · 24h">
       <div className="w-full overflow-hidden">
         <div className="relative h-28 w-full sm:h-36">
           <svg viewBox={`0 0 ${W} ${H}`} className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
@@ -103,6 +99,6 @@ export default function PrecipAccum({ hours }) {
           ))}
         </div>
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

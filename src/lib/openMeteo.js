@@ -63,6 +63,7 @@ export function buildForecastUrl({ latitude, longitude }, modelIds) {
     models: modelIds.join(','),
     timezone: 'auto',
     forecast_days: '16',
+    past_days: '1', // yesterday's hours, for the "vs yesterday" comparison
     wind_speed_unit: 'kmh',
     timeformat: 'iso8601',
   });

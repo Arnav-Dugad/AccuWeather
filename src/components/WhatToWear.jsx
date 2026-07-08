@@ -1,4 +1,5 @@
 import { Shirt, Umbrella, Glasses, Wind } from 'lucide-react';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const ICONS = { Shirt, Umbrella, Glasses, Wind };
 
@@ -31,13 +32,8 @@ export default function WhatToWear({ data }) {
   if (!tips.length) return null;
 
   return (
-    <div className="glass flex h-full flex-col rounded-3xl p-5">
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Shirt size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">What to Wear</h3>
-      </div>
-
-      <div className="mt-3 flex flex-1 flex-col gap-2.5">
+    <CollapsibleCard id="what-to-wear" icon={Shirt} title="What to Wear">
+      <div className="flex flex-col gap-2.5">
         {tips.map(({ icon, text, color }) => {
           const Icon = ICONS[icon];
           return (
@@ -53,6 +49,6 @@ export default function WhatToWear({ data }) {
           );
         })}
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

@@ -3,6 +3,7 @@ import { Droplets, Gauge, Sun, CloudRain, Cloud, Eye, Thermometer, TrendingUp, T
 import { round, compass, uvCategory, dewPointComfort, visibilityLabel } from '../lib/format.js';
 import { useUnits } from '../context/UnitsContext.jsx';
 import WindCompass from './WindCompass.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const container = { hidden: {}, visible: { transition: { staggerChildren: 0.06 } } };
 const tile = {
@@ -71,12 +72,13 @@ export default function MetricsGrid({ data }) {
   ];
 
   return (
-    <motion.div
-      className="grid grid-cols-2 gap-3 lg:grid-cols-5"
-      variants={container}
-      initial="hidden"
-      animate="visible"
-    >
+    <CollapsibleCard bare id="metrics" icon={Gauge} title="Live Conditions" bodyClass="">
+      <motion.div
+        className="grid grid-cols-2 gap-3 lg:grid-cols-5"
+        variants={container}
+        initial="hidden"
+        animate="visible"
+      >
       <motion.div variants={tile} className="col-span-2 lg:col-span-1 lg:row-span-2 glass glass-hover flex items-center justify-center rounded-2xl p-4">
         <WindCompass
           dir={c.windDir}
@@ -125,6 +127,7 @@ export default function MetricsGrid({ data }) {
           </div>
         </motion.div>
       ))}
-    </motion.div>
+      </motion.div>
+    </CollapsibleCard>
   );
 }

@@ -1,6 +1,6 @@
-import { motion } from 'framer-motion';
 import { Wind, Info } from 'lucide-react';
 import AnimatedNumber from './AnimatedNumber.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 import { aqiCategory, dominantPollutant } from '../lib/airQuality.js';
 import { round } from '../lib/format.js';
 
@@ -26,23 +26,15 @@ export default function AirQualityCard({ aq, status }) {
       ]
     : [];
 
+  const glow = (
+    <div
+      className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full opacity-40 blur-3xl"
+      style={{ background: `radial-gradient(circle, ${cat.color}, transparent 70%)` }}
+    />
+  );
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-      className="glass relative overflow-hidden rounded-3xl p-5"
-    >
-      <div
-        className="pointer-events-none absolute -right-12 -top-16 h-48 w-48 rounded-full opacity-40 blur-3xl"
-        style={{ background: `radial-gradient(circle, ${cat.color}, transparent 70%)` }}
-      />
-
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Wind size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Air Quality</h3>
-      </div>
-
+    <CollapsibleCard id="air-quality" icon={Wind} title="Air Quality" decoration={glow}>
       {loading ? (
         <div className="mt-4 space-y-3">
           <div className="skeleton h-12 w-28 rounded-xl" />
@@ -100,6 +92,6 @@ export default function AirQualityCard({ aq, status }) {
           </p>
         </>
       )}
-    </motion.div>
+    </CollapsibleCard>
   );
 }

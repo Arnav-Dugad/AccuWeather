@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, ShieldAlert, ShieldQuestion, Gauge } from 'lucide-react';
 import { useUnits } from '../context/UnitsContext.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const TONES = {
   high: { color: '#34d399', soft: 'rgba(52,211,153,0.15)', Icon: ShieldCheck, ring: 'ring-emerald-400/30', text: 'text-emerald-300' },
@@ -28,18 +29,8 @@ export default function ConfidenceIndex({ confidence }) {
   const pct = confidence.score / 100;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.05, ease: 'easeOut' }}
-      className="glass flex h-full flex-col rounded-3xl p-6"
-    >
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Gauge size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Confidence Index</h3>
-      </div>
-
-      <div className="mt-2 flex flex-1 flex-col items-center justify-center">
+    <CollapsibleCard id="confidence" icon={Gauge} title="Confidence Index">
+      <div className="flex flex-col items-center">
         <div
           className="relative"
           style={{ width: size, height: size }}
@@ -104,6 +95,6 @@ export default function ConfidenceIndex({ confidence }) {
           <div className="text-[11px] text-ink-soft">Models in consensus</div>
         </div>
       </div>
-    </motion.div>
+    </CollapsibleCard>
   );
 }

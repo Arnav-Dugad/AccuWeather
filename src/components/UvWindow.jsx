@@ -1,5 +1,6 @@
 import { Sun, ShieldAlert } from 'lucide-react';
 import { hourLabel, uvCategory, round } from '../lib/format.js';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const PROTECT_THRESHOLD = 3; // WHO: sun protection advised at UV index ≥ 3.
 
@@ -48,14 +49,9 @@ export default function UvWindow({ data }) {
   if (!uv) return null;
 
   return (
-    <div className="glass flex h-full flex-col rounded-3xl p-5" aria-label="UV protection outlook">
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Sun size={16} className="text-amber-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Sun Protection</h3>
-      </div>
-
+    <CollapsibleCard id="uv-window" icon={Sun} iconClass="text-amber-300" title="Sun Protection" ariaLabel="UV protection outlook">
       {uv.needsProtection ? (
-        <div className="mt-3 flex flex-1 flex-col justify-center gap-3">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/12">
               <ShieldAlert size={17} className="text-amber-300" />
@@ -82,12 +78,12 @@ export default function UvWindow({ data }) {
           </div>
         </div>
       ) : (
-        <div className="mt-3 flex flex-1 flex-col items-center justify-center gap-1.5 text-center">
+        <div className="flex flex-col items-center gap-1.5 py-2 text-center">
           <ShieldAlert size={22} className="text-emerald-300/70" />
           <p className="text-sm font-medium text-ink">Low UV all day</p>
           <p className="text-[11px] text-ink-soft">No sun protection needed</p>
         </div>
       )}
-    </div>
+    </CollapsibleCard>
   );
 }

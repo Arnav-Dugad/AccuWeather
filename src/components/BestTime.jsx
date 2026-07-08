@@ -1,5 +1,6 @@
 import { PersonStanding, Camera, UtensilsCrossed, Star } from 'lucide-react';
 import { hourLabel } from '../lib/format.js';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 function parseHour(iso) {
   const m = iso?.match(/T(\d{2})/);
@@ -68,13 +69,8 @@ export default function BestTime({ data }) {
   });
 
   return (
-    <div className="glass flex h-full flex-col rounded-3xl p-5">
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Star size={16} className="text-amber-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Best Time For</h3>
-      </div>
-
-      <div className="mt-3 flex flex-1 flex-col gap-2.5">
+    <CollapsibleCard id="best-time" icon={Star} iconClass="text-amber-300" title="Best Time For">
+      <div className="flex flex-col gap-2.5">
         {results.map(({ key, label, Icon, color, timeStr, quality }) => (
           <div key={key} className="flex items-center gap-3">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
@@ -92,6 +88,6 @@ export default function BestTime({ data }) {
           </div>
         ))}
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

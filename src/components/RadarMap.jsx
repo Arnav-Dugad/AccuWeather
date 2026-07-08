@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, useMap, CircleMarker } from 'react-leaflet';
 import {
   Radar, Play, Pause, ExternalLink, CloudRain, Satellite,
-  Palette, LocateFixed, Maximize2, Minimize2, ChevronLeft, ChevronRight, SkipBack,
+  Palette, LocateFixed, Maximize2, Minimize2, ChevronLeft, ChevronRight, SkipBack, ChevronDown,
 } from 'lucide-react';
+import { usePersistentDisclosure } from '../hooks/usePersistentDisclosure.js';
 
 const MAPS_URL = 'https://api.rainviewer.com/public/weather-maps.json';
 const SPEEDS = [0.5, 1, 2];
@@ -21,6 +22,18 @@ function Recenter({ lat, lon, zoom, nonce }) {
     map.setView([lat, lon], zoom, { animate: true });
     // `nonce` lets a button force a re-center without changing lat/lon/zoom.
   }, [lat, lon, zoom, nonce, map]);
+  return null;
+}
+
+// Leaflet renders for the size it had at mount; when the container resizes
+// (fullscreen toggle, or a late layout pass after lazy-load), tiles leave gray
+// gaps until invalidateSize() runs. Re-invalidate on mount + whenever fullscreen flips.
+function MapResizer({ fullscreen }) {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 200);
+    return () => clearTimeout(t);
+  }, [fullscreen, map]);
   return null;
 }
 
@@ -46,6 +59,7 @@ export default function RadarMap({ lat, lon, region }) {
   const [fullscreen, setFullscreen] = useState(false);
   const [recenterNonce, setRecenterNonce] = useState(0);
   const [err, setErr] = useState(false);
+  const [open, setOpen] = usePersistentDisclosure('radar', true);
   const timer = useRef(null);
   const rootRef = useRef(null);
 
@@ -124,8 +138,11 @@ export default function RadarMap({ lat, lon, region }) {
 
   const frame = frames[idx];
   const zoom = region?.key === 'india' ? 5 : 8;
+  // Radar frames take the smooth+snow option suffix (1_1); satellite infrared
+  // has no snow mask and must use 0_0, otherwise the tiles don't resolve.
+  const tileOpts = layer === 'satellite' ? '0_0' : '1_1';
   const tileUrl =
-    host && frame ? `${host}${frame.path}/512/{z}/{x}/{y}/${scheme.id}/1_1.png` : null;
+    host && frame ? `${host}${frame.path}/512/{z}/{x}/{y}/${scheme.id}/${tileOpts}.png` : null;
   const stampAbs = frame ? new Date(frame.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
   const stampRel = frame ? relativeLabel(frame.time) : '';
   const isForecast = layer === 'radar' && frames.length > 0 && idx >= pastCount && pastCount > 0;
@@ -150,12 +167,14 @@ export default function RadarMap({ lat, lon, region }) {
           <div>
             <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">Live Radar</div>
             <h3 className="font-display text-base font-semibold text-ink">
-              {layer === 'satellite' ? 'Cloud &amp; Satellite' : 'Precipitation Radar'}
+              {layer === 'satellite' ? 'Cloud & Satellite' : 'Precipitation Radar'}
             </h3>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {(open || fullscreen) && (
+            <>
           {/* layer toggle */}
           <div className="chip flex items-center gap-0.5 rounded-xl p-0.5">
             <button
@@ -198,8 +217,25 @@ export default function RadarMap({ lat, lon, region }) {
           >
             {fullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
+            </>
+          )}
+          {/* collapse (hidden in fullscreen) */}
+          {!fullscreen && (
+            <button
+              onClick={() => setOpen((o) => !o)}
+              className={`${controlBtn} w-9`}
+              aria-expanded={open}
+              title={open ? 'Collapse radar' : 'Expand radar'}
+              aria-label={open ? 'Collapse radar' : 'Expand radar'}
+            >
+              <ChevronDown size={16} className={`transition-transform ${open ? '' : '-rotate-90'}`} />
+            </button>
+          )}
         </div>
       </div>
+
+      {(open || fullscreen) && (
+        <>{/* --- collapsible body --- */}
 
       {/* ---- map ---- */}
       <div
@@ -242,6 +278,7 @@ export default function RadarMap({ lat, lon, region }) {
             pathOptions={{ color: '#38bdf8', fillColor: '#38bdf8', fillOpacity: 0.9, weight: 2 }}
           />
           <Recenter lat={lat} lon={lon} zoom={zoom} nonce={recenterNonce} />
+          <MapResizer fullscreen={fullscreen} />
         </MapContainer>
 
         {/* recenter (floating, top-right) */}
@@ -373,6 +410,8 @@ export default function RadarMap({ lat, lon, region }) {
           </a>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }

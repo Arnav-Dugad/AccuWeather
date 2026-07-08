@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Sunrise, Sunset, Sun, Clock } from 'lucide-react';
 import { clockFromISO, round, uvCategory } from '../lib/format.js';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 function sunProgress(sunrise, sunset, utcOffset) {
   if (!sunrise || !sunset) return -1;
@@ -73,21 +74,15 @@ export default function SunArc({ sun, utcOffset, sunshineDuration }) {
 
   const arcPath = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
 
-  return (
-    <div className="glass glass-hover rounded-3xl p-5">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-ink-soft">
-          <Sun size={16} className="text-amber-300" />
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Sun Position</h3>
-        </div>
-        {countdown && (
-          <span className="inline-flex items-baseline gap-1 rounded-full bg-amber-400/10 px-2.5 py-1 text-[11px] ring-1 ring-amber-400/20">
-            <span className="text-ink-soft">{countdown.label}</span>
-            <span className="font-display font-semibold tabular-nums text-amber-200">{countdown.value}</span>
-          </span>
-        )}
-      </div>
+  const countdownChip = countdown ? (
+    <span className="inline-flex shrink-0 items-baseline gap-1 rounded-full bg-amber-400/10 px-2.5 py-1 text-[11px] ring-1 ring-amber-400/20">
+      <span className="text-ink-soft">{countdown.label}</span>
+      <span className="font-display font-semibold tabular-nums text-amber-200">{countdown.value}</span>
+    </span>
+  ) : null;
 
+  return (
+    <CollapsibleCard id="sun" icon={Sun} iconClass="text-amber-300" title="Sun Position" actions={countdownChip}>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className="w-full"
@@ -199,6 +194,6 @@ export default function SunArc({ sun, utcOffset, sunshineDuration }) {
           </div>
         </>
       )}
-    </div>
+    </CollapsibleCard>
   );
 }

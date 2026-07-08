@@ -14,6 +14,12 @@ const CURRENT_VARS = [
   'nitrogen_dioxide',
   'sulphur_dioxide',
   'carbon_monoxide',
+  'alder_pollen',
+  'birch_pollen',
+  'grass_pollen',
+  'mugwort_pollen',
+  'olive_pollen',
+  'ragweed_pollen',
 ];
 
 export async function fetchAirQuality({ latitude, longitude }, signal) {
@@ -36,9 +42,65 @@ export async function fetchAirQuality({ latitude, longitude }, signal) {
     no2: c.nitrogen_dioxide ?? null,
     so2: c.sulphur_dioxide ?? null,
     co: c.carbon_monoxide ?? null,
+    alderPollen: c.alder_pollen ?? null,
+    birchPollen: c.birch_pollen ?? null,
+    grassPollen: c.grass_pollen ?? null,
+    mugwortPollen: c.mugwort_pollen ?? null,
+    olivePollen: c.olive_pollen ?? null,
+    ragweedPollen: c.ragweed_pollen ?? null,
     time: c.time ?? null,
   };
 }
+
+// Per-species grains/m³ thresholds → [low, moderate, high] cutoffs. Ragweed and
+// olive are potent at lower counts; grass/birch need higher counts to matter.
+const POLLEN_SPECIES = [
+  { key: 'grassPollen', label: 'Grass', cut: [1, 20, 50] },
+  { key: 'birchPollen', label: 'Birch', cut: [1, 20, 90] },
+  { key: 'ragweedPollen', label: 'Ragweed', cut: [1, 10, 50] },
+  { key: 'olivePollen', label: 'Olive', cut: [1, 20, 50] },
+  { key: 'alderPollen', label: 'Alder', cut: [1, 20, 90] },
+  { key: 'mugwortPollen', label: 'Mugwort', cut: [1, 10, 50] },
+];
+
+const RISK_LEVELS = [
+  { label: 'None', color: '#64748b' },
+  { label: 'Low', color: '#34d399' },
+  { label: 'Moderate', color: '#fbbf24' },
+  { label: 'High', color: '#fb7185' },
+];
+
+/** Severity 0-3 for a species value against its cutoffs. */
+function pollenLevel(value, cut) {
+  if (!Number.isFinite(value) || value < cut[0]) return 0;
+  if (value < cut[1]) return 1;
+  if (value < cut[2]) return 2;
+  return 3;
+}
+
+/**
+ * Summarize pollen for the card: per-species level + the overall (worst) risk.
+ * Returns null when no species has any measurable data (outside coverage).
+ */
+export function pollenRisk(aq) {
+  if (!aq) return null;
+  const species = POLLEN_SPECIES.map((s) => {
+    const value = aq[s.key];
+    return { ...s, value, level: pollenLevel(value, s.cut) };
+  }).filter((s) => Number.isFinite(s.value));
+
+  if (!species.length) return null; // no pollen data at this location
+
+  const withPollen = species.filter((s) => s.value >= s.cut[0]);
+  const maxLevel = species.reduce((m, s) => Math.max(m, s.level), 0);
+  const overall = RISK_LEVELS[maxLevel];
+
+  // Show the most-present allergens first.
+  const ranked = [...species].sort((a, b) => b.level - a.level || b.value - a.value);
+
+  return { overall, maxLevel, species: ranked, active: withPollen.length, levels: RISK_LEVELS };
+}
+
 
 /**
  * US EPA AQI category for a US AQI value.

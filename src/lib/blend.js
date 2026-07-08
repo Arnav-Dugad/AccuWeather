@@ -178,6 +178,14 @@ export function buildWeatherModel(api, region, modelIds) {
   const dates = daily.time ?? [];
   const now = currentHourIndex(times, api.utc_offset_seconds);
 
+  // With `past_days=1` the arrays are prepended with yesterday, so daily[0] is
+  // yesterday. Find today's slot so every "today" access stays correct.
+  const todayStr = new Date(Date.now() + (api.utc_offset_seconds ?? 0) * 1000)
+    .toISOString()
+    .slice(0, 10);
+  const foundToday = dates.indexOf(todayStr);
+  const todayIdx = foundToday >= 0 ? foundToday : 0;
+
   // Per-model snapshot + availability.
   const models = modelIds.map((id) => {
     const meta = MODELS[id] ?? { id, label: id, full: id, origin: '', accent: '#94a3b8' };
@@ -213,8 +221,8 @@ export function buildWeatherModel(api, region, modelIds) {
         isDay: get('is_day') === 1,
       },
       today: {
-        tMax: dmax && isNum(dmax[0]) ? dmax[0] : null,
-        tMin: dmin && isNum(dmin[0]) ? dmin[0] : null,
+        tMax: dmax && isNum(dmax[todayIdx]) ? dmax[todayIdx] : null,
+        tMin: dmin && isNum(dmin[todayIdx]) ? dmin[todayIdx] : null,
       },
     };
   });
@@ -282,6 +290,17 @@ export function buildWeatherModel(api, region, modelIds) {
     precip: weightedBlend(weightPair((m) => m.current.precip)),
     windDir: weightedCircularBlend(weightPair((m) => m.current.windDir)),
     isDay: lead ? lead.current.isDay : true,
+    // Same hour, 24h ago (needs past_days=1); null near the start of the array.
+    tempYesterday: now >= 24 ? blendAt('temperature_2m', now - 24, robustWeightedBlend) : null,
+    codeYesterday:
+      now >= 24
+        ? weightedCodeMode(
+            models.map((m) => {
+              const arr = series(hourly, 'weather_code', m.id);
+              return { value: arr ? arr[now - 24] : null, weight: m.weight };
+            }),
+          )
+        : null,
   };
   // Don't show a rain/drizzle headline when there's effectively no precipitation.
   cur.code = reconcileCode(cur.code, { precip: cur.precip, precipProb: cur.precipProb, cloud: cur.cloud });
@@ -323,8 +342,8 @@ export function buildWeatherModel(api, region, modelIds) {
     });
   }
 
-  // ---- consensus: daily (7 days) ----
-  const dailyConsensus = dates.map((date, i) => {
+  // ---- consensus: daily ----
+  const dailyConsensusFull = dates.map((date, i) => {
     const pairAt = (v) =>
       models.map((m) => {
         const arr = dseries(daily, v, m.id);
@@ -350,14 +369,16 @@ export function buildWeatherModel(api, region, modelIds) {
       uvMax: weightedBlend(pairAt('uv_index_max')),
     };
   });
+  // Drop the prepended past day(s) so daily[0] is today for every consumer.
+  const dailyConsensus = dailyConsensusFull.slice(todayIdx);
 
   const pressureTrend = computePressureTrend(models, hourly, now);
   const confidence = computeConfidence(models, hourly, modelIds, now);
 
   // Sunrise/sunset are non-blendable strings: take today's from the lead model.
   const sun = {
-    sunrise: lead ? dseries(daily, 'sunrise', lead.id)?.[0] ?? null : null,
-    sunset: lead ? dseries(daily, 'sunset', lead.id)?.[0] ?? null : null,
+    sunrise: lead ? dseries(daily, 'sunrise', lead.id)?.[todayIdx] ?? null : null,
+    sunset: lead ? dseries(daily, 'sunset', lead.id)?.[todayIdx] ?? null : null,
     uvMax: dailyConsensus[0]?.uvMax ?? null,
   };
 

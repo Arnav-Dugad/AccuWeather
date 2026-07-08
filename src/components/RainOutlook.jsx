@@ -3,6 +3,7 @@ import { Droplets, Layers3, ShieldCheck, ShieldAlert, ShieldQuestion } from 'luc
 import { popCategory } from '../lib/rain.js';
 import { hourLabel, dayLabel } from '../lib/format.js';
 import { useUnits } from '../context/UnitsContext.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const CONF_ICON = { high: ShieldCheck, moderate: ShieldQuestion, low: ShieldAlert };
 const CONF_COLOR = { high: '#34d399', moderate: '#fbbf24', low: '#fb7185' };
@@ -26,32 +27,24 @@ export default function RainOutlook({ outlook, status }) {
 
   const maxHourAmt = Math.max(0.5, ...outlook.hourly.map((h) => h.p75 || 0));
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="glass rounded-3xl p-5 sm:p-6"
+  const confBadge = (
+    <span
+      className="hidden shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 sm:inline-flex"
+      style={{ background: `${confColor}1f`, color: confColor, borderColor: `${confColor}55` }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <Layers3 size={18} className="text-sky-300" />
-          <div>
-            <h3 className="font-display text-base font-semibold text-ink">Rain Outlook</h3>
-            <p className="text-xs text-ink-soft">
-              Ensemble probability · {rc.memberCount} members across {rc.models} models
-            </p>
-          </div>
-        </div>
-        <span
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1"
-          style={{ background: `${confColor}1f`, color: confColor, borderColor: `${confColor}55` }}
-        >
-          <ConfIcon size={13} />
-          {rc.label} confidence · {rc.agreement}% agree
-        </span>
-      </div>
+      <ConfIcon size={13} />
+      {rc.label} · {rc.agreement}% agree
+    </span>
+  );
 
+  return (
+    <CollapsibleCard
+      id="rain-outlook"
+      icon={Layers3}
+      title="Rain Outlook"
+      subtitle={`${rc.memberCount} members · ${rc.models} models`}
+      actions={confBadge}
+    >
       {/* next 24h PoP bars */}
       <div className="mt-5">
         <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
@@ -112,6 +105,6 @@ export default function RainOutlook({ outlook, status }) {
           );
         })}
       </div>
-    </motion.div>
+    </CollapsibleCard>
   );
 }

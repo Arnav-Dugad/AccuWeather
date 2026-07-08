@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Activity, Droplets, Wind, Sun, Eye, Thermometer, CloudRain, Haze } from 'lucide-react';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const TONES = {
   excellent: { color: '#34d399', soft: 'rgba(52,211,153,0.15)', label: 'Excellent', ring: 'ring-emerald-400/30', text: 'text-emerald-300' },
@@ -65,13 +66,8 @@ export default function ActivityScore({ data, aq }) {
   const arcLen = (sweep / 360) * circ;
 
   return (
-    <div className="glass flex h-full flex-col rounded-3xl p-5">
-      <div className="flex items-center gap-2 text-ink-soft">
-        <Activity size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Outdoor Score</h3>
-      </div>
-
-      <div className="mt-2 flex flex-1 flex-col items-center justify-center">
+    <CollapsibleCard id="activity-score" icon={Activity} title="Outdoor Score">
+      <div className="flex flex-col items-center">
         <div className="relative" style={{ width: size, height: size }}
           role="img" aria-label={`Outdoor activity score ${score} out of 100, ${tone.label}`}>
           <svg width={size} height={size} className="-rotate-90" aria-hidden="true">
@@ -108,6 +104,6 @@ export default function ActivityScore({ data, aq }) {
           </span>
         ))}
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

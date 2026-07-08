@@ -5,6 +5,7 @@ import WeatherIcon from './WeatherIcon.jsx';
 import { hourLabel, round } from '../lib/format.js';
 import { useUnits } from '../context/UnitsContext.jsx';
 import TempChart from './TempChart.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 /** Next-24h consensus: switchable metric chart + horizontally scrollable strip. */
 export default function HourlyStrip({ data }) {
@@ -35,30 +36,24 @@ export default function HourlyStrip({ data }) {
   const chips = ['temp', 'feels', 'rain', 'wind', 'humidity', 'uv'];
 
   return (
-    <div className="glass w-full overflow-hidden rounded-3xl p-5 sm:p-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-ink-soft">
-          <Clock size={16} className="text-sky-300" />
-          <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Next 24 Hours</h3>
-        </div>
-        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Hourly metric">
-          {chips.map((k) => {
-            const active = k === metricKey;
-            return (
-              <button
-                key={k}
-                type="button"
-                onClick={() => setMetricKey(k)}
-                aria-pressed={active}
-                className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
-                  active ? 'bg-sky-400/20 text-sky-200 ring-1 ring-sky-400/40' : 'chip text-ink-soft hover:text-ink'
-                }`}
-              >
-                {metrics[k].short}
-              </button>
-            );
-          })}
-        </div>
+    <CollapsibleCard id="hourly" icon={Clock} title="Next 24 Hours">
+      <div className="mb-4 flex flex-wrap gap-1.5" role="group" aria-label="Hourly metric">
+        {chips.map((k) => {
+          const active = k === metricKey;
+          return (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setMetricKey(k)}
+              aria-pressed={active}
+              className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition ${
+                active ? 'bg-sky-400/20 text-sky-200 ring-1 ring-sky-400/40' : 'chip text-ink-soft hover:text-ink'
+              }`}
+            >
+              {metrics[k].short}
+            </button>
+          );
+        })}
       </div>
 
       <TempChart key={metricKey} hours={hours} metric={metric} />
@@ -93,6 +88,6 @@ export default function HourlyStrip({ data }) {
           );
         })}
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

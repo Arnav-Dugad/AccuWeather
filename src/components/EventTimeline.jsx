@@ -1,5 +1,6 @@
 import { Clock } from 'lucide-react';
 import { hourLabel } from '../lib/format.js';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 function detectEvents(hours, sun) {
   const events = [];
@@ -81,11 +82,7 @@ export default function EventTimeline({ data }) {
     .filter((_, i) => i % 4 === 0);
 
   return (
-    <div className="glass rounded-3xl p-5">
-      <div className="mb-3 flex items-center gap-2 text-ink-soft">
-        <Clock size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Today's Events</h3>
-      </div>
+    <CollapsibleCard id="events" icon={Clock} title="Today's Events">
 
       <div className="relative h-7 w-full overflow-hidden rounded-full bg-white/5">
         {/* daytime bands (one per daylight run in the window) */}
@@ -153,6 +150,6 @@ export default function EventTimeline({ data }) {
           </span>
         )}
       </div>
-    </div>
+    </CollapsibleCard>
   );
 }

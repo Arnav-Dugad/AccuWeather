@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Cpu, ChevronDown } from 'lucide-react';
+import { usePersistentDisclosure } from '../hooks/usePersistentDisclosure.js';
 
 export default function RegionBadge({ region }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = usePersistentDisclosure('region-badge', false);
   if (!region) return null;
 
   return (

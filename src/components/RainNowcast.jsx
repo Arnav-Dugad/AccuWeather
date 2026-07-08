@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { CloudRain, CloudOff, Umbrella, Droplets } from 'lucide-react';
 import { useUnits } from '../context/UnitsContext.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 
 const TONES = {
   dry: { color: '#34d399', Icon: CloudOff, ring: 'ring-emerald-400/25' },
@@ -48,18 +49,15 @@ export default function RainNowcast({ nowcast, status }) {
     ? 'No measurable precipitation expected in the next 2 hours.'
     : `Peak intensity ${peakWord} · about ${fmtRain(total) ?? 0} ${rainUnit} total expected.`;
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: 'easeOut' }}
-      className="glass relative overflow-hidden rounded-3xl p-5 sm:p-6"
-    >
-      <div
-        className="pointer-events-none absolute -left-10 -top-12 h-44 w-44 rounded-full opacity-30 blur-3xl"
-        style={{ background: `radial-gradient(circle, ${tone.color}, transparent 70%)` }}
-      />
+  const glow = (
+    <div
+      className="pointer-events-none absolute -left-10 -top-12 h-44 w-44 rounded-full opacity-30 blur-3xl"
+      style={{ background: `radial-gradient(circle, ${tone.color}, transparent 70%)` }}
+    />
+  );
 
+  return (
+    <CollapsibleCard id="rain-nowcast" icon={Icon} title="Rain Nowcast" subtitle="next 2 hours" decoration={glow}>
       <div className="relative flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
           <span
@@ -69,9 +67,6 @@ export default function RainNowcast({ nowcast, status }) {
             <Icon size={20} style={{ color: tone.color }} />
           </span>
           <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-ink-soft">
-              Nowcast · next 2 hours
-            </div>
             <div className="font-display text-base font-semibold text-ink sm:text-lg">{nowcast.headline}</div>
             <p className="mt-0.5 text-xs text-ink-soft">{detail}</p>
           </div>
@@ -122,6 +117,6 @@ export default function RainNowcast({ nowcast, status }) {
           ))}
         </div>
       </div>
-    </motion.div>
+    </CollapsibleCard>
   );
 }

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { CalendarDays, Droplets } from 'lucide-react';
 import WeatherIcon from './WeatherIcon.jsx';
+import CollapsibleCard from './CollapsibleCard.jsx';
 import { weatherFor } from '../lib/weatherCodes.js';
 import { dayLabel, round } from '../lib/format.js';
 import { useUnits } from '../context/UnitsContext.jsx';
@@ -8,10 +9,11 @@ import { useUnits } from '../context/UnitsContext.jsx';
 /** Extended consensus forecast with a min/max range bar. */
 export default function DailyForecast({ data, rainDaily }) {
   const { fmtTemp } = useUnits();
+  // Hooks must run unconditionally — keep this above any early return.
+  const popByDate = useMemo(() => new Map((rainDaily ?? []).map((d) => [d.date, d.pop])), [rainDaily]);
+
   const days = data.consensus.daily;
   if (!days?.length) return null;
-
-  const popByDate = useMemo(() => new Map((rainDaily ?? []).map((d) => [d.date, d.pop])), [rainDaily]);
 
   const maxes = days.map((d) => d.tMax).filter((v) => typeof v === 'number' && Number.isFinite(v));
   const mins = days.map((d) => d.tMin).filter((v) => typeof v === 'number' && Number.isFinite(v));
@@ -21,12 +23,7 @@ export default function DailyForecast({ data, rainDaily }) {
   const span = Math.max(1, weekMax - weekMin);
 
   return (
-    <div className="glass w-full overflow-hidden rounded-3xl p-5 sm:p-6">
-      <div className="mb-3 flex items-center gap-2 text-ink-soft">
-        <CalendarDays size={16} className="text-sky-300" />
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em]">Extended Forecast</h3>
-      </div>
-
+    <CollapsibleCard id="daily" icon={CalendarDays} title="Extended Forecast">
       <div className="flex flex-col">
         {days.map((d, i) => {
           const { label } = weatherFor(d.code, true);
@@ -79,6 +76,6 @@ export default function DailyForecast({ data, rainDaily }) {
           Days 8–{days.length}: extended range — lower confidence
         </p>
       )}
-    </div>
+    </CollapsibleCard>
   );
 }
